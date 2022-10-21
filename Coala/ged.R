@@ -15,9 +15,9 @@ source("./Coala/gl.msfs.R")
 #please do not push to github so ignore when saved
 #write as RDS for next time
 #saveRDS(ged, "./data/ged.rda")
-
+#download the rds file from google drive and store in the data folder...
 ged <- readRDS("./data/ged.rda")
-#check ged
+#check ge
 
 table(pop(ged))
 
@@ -37,13 +37,15 @@ nLoc(jerra2)
 
 #filter for minor allele frequency
 
-jerra3 <- gl.filter.maf(jerra2, threshold = 0.05)
+#jerra3 <- gl.filter.maf(jerra2, threshold = 0.05)
 
-#down to 4727 loci, and 49 individuals
 #!no missing data when running sfs function
 #run gl.impute if necessary
-sfs <- gl.msfs(jerra3)
+sfs <- gl.msfs(jerra2)
 barplot(sfs)
+
+
+
 
 
 
