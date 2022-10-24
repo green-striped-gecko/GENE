@@ -8,13 +8,28 @@
 
 
 gl.msfs<- function(x) {
+  
+  if (sum(is.na(as.matrix(x)))>0) cat("Your data contains missing data, better to use gl.impute to fill those gaps meaningful!\n")
   pp <- seppop(x)
-  mi <- max(sapply(pp,nInd))
-  mm <- sapply(pp, function(x) table((0.5-abs(0.5-gl.alf(x)[,1]))*nInd(x)*2), simplify = FALSE)
-  # cut off zero if necessary....
-  mm2 <- sapply(mm, function(x) x[names(x)!="0"], simplify = FALSE)
-  #max number of individuals (fill with zeros)
-  mm3 <- t(sapply(mm2, function(x) c(x, rep(0, max(0,mi-length(x))))))
-  colnames(mm3)<- paste0("d",1:mi)
-  return(mm3)
+  
+ 
+  ml <- nLoc(x)
+  mix <- max(table(pop(x)))
+  sfsl <- list()
+  for (i in 1:length(pp))
+  {
+  #mm <- sapply(pp, function(x) table((0.5-abs(0.5-gl.alf(x)[,1]))*nInd(x)*2), simplify = FALSE)
+  mi <- nInd(pp[[i]])
+  cs <- colSums(as.matrix(pp[[i]]), na.rm=TRUE)
+  sfs0 <- table(mi-(abs(mi-cs)))
+  sfsf <- rep(0,mix+1)
+  sfsf[as.numeric(names(sfs0))+1] <- sfs0
+  #delete monomorphs
+  sfsf <- sfsf[-1]
+  names(sfsf)<- paste0("d",1:mix)
+  sfsl[[i]]<- sfsf
+  }
+  ll <- sapply(sfsl,length)
+  if (all(ll==max(ll))) sfsl <- do.call(rbind,sfsl)
+  return(sfsl)
 }
