@@ -55,7 +55,7 @@ function(x,
   
   # STANDARD ERROR CHECKING
   
-  if(class(x)!="genlight") {
+  if(is(x)!="genlight") {
     stop("  Fatal Error: genlight object required!\n")
   }
   
