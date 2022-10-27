@@ -7,7 +7,7 @@
 #' 
 
 
-gl.msfs<- function(x) {
+gl.msfs<- function(x, minbinsize=1) {
   
   if (sum(is.na(as.matrix(x)))>0) cat("Your data contains missing data, better to use gl.impute to fill those gaps meaningful!\n")
   pp <- seppop(x)
@@ -27,6 +27,9 @@ gl.msfs<- function(x) {
   #delete monomorphs
   sfsf <- sfsf[-1]
   names(sfsf)<- paste0("d",1:mix)
+  #delete minbinsize
+  if (minbinsize>1) sfsf <- sfsf[-c(1:(minbinsize-1))]
+  
   sfsl[[i]]<- sfsf
   }
   ll <- sapply(sfsl,length)
