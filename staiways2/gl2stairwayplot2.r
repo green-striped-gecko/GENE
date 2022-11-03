@@ -1,6 +1,6 @@
 gl2stairwayplot2 <- 
 function(x, 
-         outfile="blueprint.txt", 
+         outfile=NULL, 
          outpath=tempdir(),
          simfolder=NULL,
          minbinsize=1,
@@ -13,19 +13,22 @@ function(x,
          mu=NULL,
          gentime=NULL,
          L = NULL,
-         plot_title="Ne against time",
+         plot_title="Ne",
          xmin=0, xmax=0, ymin=0, ymax=0,
          xspacing=2,
          yspacing=2,
          fontsize=12,
          run=FALSE,
          parallel=1,
-         verbose=NULL) {
+         verbose=NULL, 
+         sfs=NULL, 
+         cleanup=TRUE) {
   
   # TRAP COMMAND, SET VERSION
   
   funname <- match.call()[[1]]
   build <- "Juliette"
+  outfile <- paste0(simfolder,"blueprint")
   outfilespec <- file.path(outpath, outfile)
   
   # SET VERBOSITY
@@ -55,7 +58,7 @@ function(x,
   
   # STANDARD ERROR CHECKING
   
-  if(is(x)!="genlight") {
+  if(!is(x,"genlight")) {
     stop("  Fatal Error: genlight object required!\n")
   }
   
@@ -94,21 +97,21 @@ function(x,
 
   
   
-  usfs <- colSums(as.matrix(x), na.rm=T)
+  #usfs <- colSums(as.matrix(x), na.rm=T)
   
   #fold usfs (in case of uneven individuals, drop the 0s and minbinsize)
-  usfs <- ifelse(usfs>nInd(x), nInd(x)*2-usfs, usfs)
-  sfs <- table(usfs)[-(1:minbinsize)]
+  #usfs <- ifelse(usfs>nInd(x), nInd(x)*2-usfs, usfs)
+  #sfs <- table(usfs)[-(1:minbinsize)]
 
   #fill in empty bins in sfs with zeros
-  if (length(sfs) != (nInd(x)-(minbinsize-1) )) {
+  #if (length(sfs) != (nInd(x)-(minbinsize-1) )) {
     
-    sfs2 <- rep(0,(nInd(x)-(minbinsize-1) ))
-    sfs2[as.numeric(names(sfs))]  <- sfs
-    sfs <- sfs2
+    #sfs2 <- rep(0,(nInd(x)-(minbinsize-1) ))
+    #sfs2[as.numeric(names(sfs))]  <- sfs
+    #sfs <- sfs2
     
-  }
-  
+  #}
+  if (is.null(sfs)) sfs <- gl.msfs(x, minbinsize=minbinsize)
   
  #cut at maxbinsize
  #sfs <- sfs[1:maxbinsize] (not necessary)
@@ -192,7 +195,7 @@ function(x,
               file=outfilespec,
               row.names=FALSE,col.names=FALSE,
               quote=FALSE, sep=" ",append=TRUE)
-  write.table(paste("plot_title:", plot_title, "# title of the plot"),
+  write.table(paste("plot_title:", paste0(plot_title," [",simfolder,"]"), "# title of the plot"),
               file=outfilespec,
               row.names=FALSE,col.names=FALSE,
               quote=FALSE, sep=" ",append=TRUE)
@@ -279,7 +282,7 @@ function(x,
     
     
     
-    if (er==1)
+    if (length(er)>0)
     {
     cat("Attempt to rerun last step with different settings (lower memory allocation fo the Java Virtual Machine")
     ff <- readLines(paste0(outfile, ".plot.bat"))
@@ -296,7 +299,11 @@ function(x,
     if (Sys.info()['sysname']=="Windows") system(paste0(outfile, ".plot.bat"))
     }
     cat("Check plots (pdf and png files) in folder:", file.path(outpath, simfolder),".\n")
-    
+    if (cleanup) {
+    unlink(file.path(outpath, simfolder,"input"), recursive = TRUE)
+    unlink(file.path(outpath, simfolder,"rand*"), recursive = TRUE)
+    unlink(file.path(outpath, simfolder,"final"), recursive = TRUE)
+    }
   }
 
   return(NULL)
