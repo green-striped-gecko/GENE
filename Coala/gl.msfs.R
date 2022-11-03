@@ -16,7 +16,7 @@ gl.msfs<- function(x, minbinsize=0, folded=TRUE, singlepop=FALSE) {
   if (nPop(x)==0) {
     cat("No population definition provided. I proceed, assuming your genlight/dartR object is a single population.\n")
     pop(x)<- rep("A", nInd(x))
-    }
+  }
   if (nPop(x)==1 | singlepop==TRUE)
   {
     mi <- nInd(x)
@@ -35,42 +35,42 @@ gl.msfs<- function(x, minbinsize=0, folded=TRUE, singlepop=FALSE) {
     cs <-list()
     for (i in 1:length(pp))
     {
-    mi <- nInd(pp[[i]])
-    if (!folded) mi=2*mi  #double the number of slots...
-  sfs0 <- colSums(as.matrix(pp[[i]]), na.rm=TRUE)
-   if (folded) cs[[i]] <- mi-(abs(mi-sfs0)) else cs[[i]] <- sfs0 
+      mi <- nInd(pp[[i]])
+      if (!folded) mi=2*mi  #double the number of slots...
+      sfs0 <- colSums(as.matrix(pp[[i]]), na.rm=TRUE)
+      if (folded) cs[[i]] <- mi-(abs(mi-sfs0)) else cs[[i]] <- sfs0 
     }
-  
-  #add zeros and make sure they are consistent  
     
-  
-  msfs0 <- do.call(table, cs)  
-  aa <-array(0,dim=table(pop(x))*2+1)
-  dimnames(aa) <- sapply(dim(aa), function(x) paste0("d",0:(x-1)), simplify = F)
-  dn <- dimnames(msfs0)
-  
-  do <- lapply(dn, function(x) 1:length(x))
-  do1 <- expand.grid(do)
-  do2 <- apply(do1, 2, as.numeric)
-  dn1 <-expand.grid(dn)
-  dn2 <- apply(dn1,2, as.numeric)
-  dn3 <- dn2+1
-
-  for (i in 1:nrow(dn3))
-  {
-    aa[t(dn3[i,])] <- msfs0[t(do2[i,])] 
-  }
-  #delete minbinsize
-  if (minbinsize>0) 
-  {
-    tt <- paste0("aa[",paste0(rep("-c(1:minbinsize)",length(dim(aa))), collapse = ","),"]")
-    aa <- eval(parse(text=tt))
+    #add zeros and make sure they are consistent  
     
-  }
-  
- 
-  
-  sfs <- aa
+    
+    msfs0 <- do.call(table, cs)  
+    aa <-array(0,dim=table(pop(x))*2+1)
+    dimnames(aa) <- sapply(dim(aa), function(x) paste0("d",0:(x-1)), simplify = F)
+    dn <- dimnames(msfs0)
+    
+    do <- lapply(dn, function(x) 1:length(x))
+    do1 <- expand.grid(do)
+    do2 <- apply(do1, 2, as.numeric)
+    dn1 <-expand.grid(dn)
+    dn2 <- apply(dn1,2, as.numeric)
+    dn3 <- dn2+1
+    
+    for (i in 1:nrow(dn3))
+    {
+      aa[t(dn3[i,])] <- msfs0[t(do2[i,])] 
+    }
+    #delete minbinsize
+    if (minbinsize>0) 
+    {
+      tt <- paste0("aa[",paste0(rep("-c(1:minbinsize)",length(dim(aa))), collapse = ","),"]")
+      aa <- eval(parse(text=tt))
+      
+    }
+    
+    
+    
+    sfs <- aa
   }
   return(sfs)
 }
