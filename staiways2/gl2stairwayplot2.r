@@ -221,9 +221,9 @@ gl2stairwayplot2 <-
                 quote=FALSE, sep=" ",append=TRUE)
     
     if (verbose > 2) {cat(paste("    Stairway Plot 2 blueprint written to",outfilespec,"\n"))}
-    
+    os <- Sys.info()['sysname']
     #set blueprint.sh to executable under linux
-    if (Sys.info()['sysname']=="Linux") system(paste0("chmod 777 ",outfilespec)) 
+    if (os=="Linux" | os=="Darwin") system(paste0("chmod 777 ",outfilespec)) 
     # FLAG SCRIPT END
     
     if (verbose > 0) {
@@ -236,14 +236,14 @@ gl2stairwayplot2 <-
       
       system(paste0("java -cp stairway_plot_es Stairbuilder ",outfile ))
       #make .sh file executable...
-      if (Sys.info()['sysname']=="Linux") system(paste0("chmod 777 ",outfile, ".sh"))
+      if (os=="Linux" | os=="Darwin") system(paste0("chmod 777 ",outfile, ".sh"))
       
       
       #run on multiple cores
       if (parallel>1)
       {
-        if (Sys.info()['sysname']=="Windows") ff <- readLines(paste0(outfile, ".bat"))
-        if (Sys.info()['sysname']=="Linux") ff <- readLines(paste0(outfile, ".sh"))
+        if (os=="Windows") ff <- readLines(paste0(outfile, ".bat"))
+        if (os=="Linux" | os=="Darwin") ff <- readLines(paste0(outfile, ".sh"))
         no_cores <- min(parallel, detectCores()-1)
         plan(multisession, workers = no_cores)
         
@@ -259,25 +259,25 @@ gl2stairwayplot2 <-
         temp <- future_map(1:length(runs), function(x) runstair(x))
         
         
-        if (Sys.info()['sysname']=="Windows") index = grep("MOVE", ff)
-        if (Sys.info()['sysname']=="Linux") index = grep("mv -f",ff)
+        if (os=="Windows") index = grep("MOVE", ff)
+        if (os=="Linux" | os=="Darwin") index = grep("mv -f",ff)
         runs <- ff[index]
-        if (Sys.info()['sysname']=="Windows") runs <- gsub("MOVE /y", "cp " ,runs)
+        if (os=="Windows") runs <- gsub("MOVE /y", "cp " ,runs)
         
         for (i in 1:length(runs)) system(runs[i])
         
         index = grep("Stairpainter", ff)
         system( ff[index])
         er <- {
-          if (Sys.info()['sysname']=="Linux") system(paste0("bash ",outfile, ".plot.sh"))
-          if (Sys.info()['sysname']=="Windows") system(paste0(outfile, ".plot.bat"))
+          if (os=="Linux" | os=="Darwin") system(paste0("bash ",outfile, ".plot.sh"))
+          if (os=="Windows") system(paste0(outfile, ".plot.bat"))
         }
         
       } else er <- {
-        if (Sys.info()['sysname']=="Linux") {
+        if (os=="Linux" | os=="Darwin") {
           system(paste0("./",outfile, ".sh"))
         }
-        if (Sys.info()['sysname']=="Windows") system(paste0(outfile, ".bat"))
+        if (os=="Windows") system(paste0(outfile, ".bat"))
       }
       
       
@@ -291,12 +291,12 @@ gl2stairwayplot2 <-
         writeLines(ff, con)
         close(con)
         
-        if (Sys.info()['sysname']=="Linux") system(paste0("chmod 777 ",outfile, ".plot.sh"))
-        if (Sys.info()['sysname']=="Linux") {
+        if (os=="Linux" | os=="Darwin") system(paste0("chmod 777 ",outfile, ".plot.sh"))
+        if os=="Linux" | os=="Darwin") {
           system(paste0("./",outfile, ".plot.sh")) 
         }
         
-        if (Sys.info()['sysname']=="Windows") system(paste0(outfile, ".plot.bat"))
+        if (os=="Windows") system(paste0(outfile, ".plot.bat"))
       }
       cat("Check plots (pdf and png files) in folder:", file.path(outpath, simfolder),".\n")
       if (cleanup) {
