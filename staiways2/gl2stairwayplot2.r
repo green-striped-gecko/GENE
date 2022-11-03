@@ -292,7 +292,7 @@ gl2stairwayplot2 <-
         close(con)
         
         if (os=="Linux" | os=="Darwin") system(paste0("chmod 777 ",outfile, ".plot.sh"))
-        if os=="Linux" | os=="Darwin") {
+        if (os=="Linux" | os=="Darwin") {
           system(paste0("./",outfile, ".plot.sh")) 
         }
         
@@ -308,4 +308,4 @@ gl2stairwayplot2 <-
     
     return(NULL)
     
-  }
+}
