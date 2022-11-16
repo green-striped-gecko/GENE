@@ -106,10 +106,11 @@ gl.epos <- function(x,epos.path, sfs=NULL, minbinsize=1,folded=TRUE, l=NULL,
   epdummy <- system(eposcmd, inter=T, show.output.on.console = T)
   writeLines(epdummy,file.path(tempdir(),"ep.dat"))
   eposout <- system("epos2plot ep.dat", intern = TRUE)
+  setwd(old.path)
   ep2 <- (do.call(rbind,(strsplit(eposout,split = "\t"))))
   epp <- data.frame(ep2[-1,])
   colnames(epp)<- ep2[1,]
-  setwd(old.path)
+  epp <- data.frame(apply(epp,2, as.numeric))
   #if (verbose >= 1) {
   #  cat(report("Completed:", funname, "\n"))
   #}

@@ -1,0 +1,11 @@
+fox <- readRDS("d:/bernd/daten/foxesSNPs/foxes.rda")
+#fox <- readRDS("~/GENE/data/foxes.rda")
+f2 <- gl.keep.pop(fox, pop.list = "main")
+f3 <- gl.filter.callrate(f2,threshold = 0.5)
+f4 <- gl.impute(f3, method="frequency")
+gl.sfs(f4)
+
+gg <- gl.epos(f4, epos.path = "d:/programms/epos/", l = 1e8, u=1e-8, boot=10)
+plot(log(Median) ~ log(X.Time+1), data=gg, type="l", lwd=2)
+points(log(LowerQ) ~ log(X.Time+1), data=gg, type="l", col="blue", lty=2)
+points(log(UpperQ) ~ log(X.Time+1), data=gg, type="l", col="orange", lty=2)
